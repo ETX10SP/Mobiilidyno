@@ -4,9 +4,11 @@
     <string name="app_name">Mobiilidyno</string>
     <string name="action_settings">Settings</string>
     <string name="asetuksetOtsikko">Arvojen asetukset</string>
-    <string name="asetus1">Asetus 1</string>
+    <string name="kuskinPainoTextView">Kuskin Paino: </string>
+    <string name="pyoranPainoTextView">Pyörän Paino: </string>
     <string name="aloitaMittausButton">Aloita mittaus</string>
     <string name="selaaButton">Selaa mittauksia</string>
     <string name="asetuksetButton">Asetukset</string>
     <string name="tietojaButton">Tietoja</string>
+    <string name="asetuksetTallennaButton">Tallenna</string>
 </resources>
