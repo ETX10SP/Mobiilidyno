@@ -7,22 +7,18 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnClickListener {
-
-	Button asetuksetButton;
+public class AsetuksetActivity extends Activity implements OnClickListener {
 	
 	void initializeComponents()
 	{
-		this.asetuksetButton = (Button) findViewById(R.id.asetuksetButton);
-		this.asetuksetButton.setOnClickListener(this);
+		
 	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_asetukset);
 		
 		initializeComponents();
 	}
@@ -37,20 +33,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		
-		Intent intent;
 		
-		if(v.equals(this.asetuksetButton))
-		{
-			intent = new Intent(this, AsetuksetActivity.class);
-			
-			startActivity(intent);
-		}
 	}
-	
-	public void showToast(String message)
-    {
-    	Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-    }
-	
-
 }
