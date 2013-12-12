@@ -13,4 +13,7 @@
     <string name="asetuksetTallennaButton">Tallenna</string>
     <string name="valitysSuhteetTextView">Välityssuhteet</string>
     <string name="renkaidenKokoTextView">Renkaiden koko</string>
+    <string name="mittaustenSelausOtsikko">Mittaukset</string>
+    <string name="tietoaOhjelmastaOtsikko">Tietoa ohjelmasta</string>
+
 </resources>
