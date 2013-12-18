@@ -1,8 +1,6 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
 import java.util.List;
-
-import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -10,6 +8,7 @@ import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
+import android.media.audiofx.NoiseSuppressor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;

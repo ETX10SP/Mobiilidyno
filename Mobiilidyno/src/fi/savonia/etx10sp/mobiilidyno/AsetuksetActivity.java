@@ -90,7 +90,6 @@ public class AsetuksetActivity extends Activity implements OnClickListener {
 	    HashMap<String, String> ss=null;
 	    try {
 	    	f = new File(Environment.getExternalStorageDirectory(), "asetukset.data");
-	    	showToast(f.getAbsolutePath());
 	        in = new ObjectInputStream(new FileInputStream(f));  
 	        ss=(HashMap<String, String>) in.readObject();
 	        in.close();
