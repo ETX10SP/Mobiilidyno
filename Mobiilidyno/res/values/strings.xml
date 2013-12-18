@@ -7,6 +7,7 @@
     <string name="kuskinPainoTextView">Kuskin Paino: </string>
     <string name="pyoranPainoTextView">Pyörän Paino: </string>
     <string name="aloitaMittausButton">Aloita mittaus</string>
+    <string name="lopetaMittausButton">Lopeta mittaus</string>
     <string name="selaaButton">Selaa mittauksia</string>
     <string name="asetuksetButton">Asetukset</string>
     <string name="tietojaButton">Tietoja</string>
@@ -15,5 +16,8 @@
     <string name="renkaidenKokoTextView">Renkaiden koko</string>
     <string name="mittaustenSelausOtsikko">Mittaukset</string>
     <string name="tietoaOhjelmastaOtsikko">Tietoa ohjelmasta</string>
+    <string name="title_activity_mittaus">MittausActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="nopeus">Nopeus</string>
 
 </resources>
