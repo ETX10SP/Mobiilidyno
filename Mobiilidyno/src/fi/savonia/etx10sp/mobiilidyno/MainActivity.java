@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener {
 
+	Button aloitaButton;
 	Button asetuksetButton;
 	Button selaaButton;
 	Button tietojaButton;
@@ -31,6 +32,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		this.tietojaButton = (Button) findViewById(R.id.tietojaButton);
 		this.tietojaButton.setOnClickListener(this);
+		
+		this.aloitaButton = (Button)findViewById(R.id.aloitaMittausButton);
+		this.aloitaButton.setOnClickListener(this);
+		
 	}
 	
 	@Override
@@ -78,7 +83,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		Intent intent = null;
 		
-		if(v.equals(this.asetuksetButton))
+		if(v.equals(this.aloitaButton))
+		{
+			intent = new Intent(this, MittausActivity.class);
+		}
+		else if(v.equals(this.asetuksetButton))
 		{
 			intent = new Intent(this, AsetuksetActivity.class);		
 		}
