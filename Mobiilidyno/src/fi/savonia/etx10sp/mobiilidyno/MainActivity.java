@@ -54,23 +54,6 @@ public class MainActivity extends Activity implements OnClickListener {
         	kytkeGPSDialog();
         }
         
-        // K‰yd‰‰n l‰pi k‰ytett‰viss‰ olevat sensorit
-        Boolean accelerometer = false;
-        SensorManager mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
-        for (int i = 0; i< deviceSensors.size(); i++) {
-            if (deviceSensors.get(i).getType() == Sensor.TYPE_ACCELEROMETER) {
-            	accelerometer = true;
-                break;
-            }
-        }
-        
-        // Suljetaan sovellus jos kiihtyvuusanturi ei ole k‰ytett‰viss‰
-        if (accelerometer == false)
-        {
-        	showToast("Kiihtyvyysanturi ei k‰ytett‰viss‰");
-        	this.finish();
-        }
 	}
 
 	@Override
