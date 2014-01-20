@@ -11,7 +11,10 @@ import org.openintents.sensorsimulator.hardware.SensorEvent;
 import org.openintents.sensorsimulator.hardware.SensorEventListener;
 import org.openintents.sensorsimulator.hardware.SensorManagerSimulator;
 
+import java.util.List;
+
 import android.app.Activity;
+//import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +24,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MittausActivity extends Activity {
 
@@ -111,6 +115,26 @@ public class MittausActivity extends Activity {
 		// //////////////////////////////////////////////////////////////
 
 		initListeners();
+		
+		/*
+        // K‰yd‰‰n l‰pi k‰ytett‰viss‰ olevat sensorit
+        Boolean accelerometer = false;
+        SensorManager mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        for (int i = 0; i< deviceSensors.size(); i++) {
+            if (deviceSensors.get(i).getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            	accelerometer = true;
+                break;
+            }
+        }
+        
+        // Suljetaan n‰kym‰ jos kiihtyvuusanturi ei ole k‰ytett‰viss‰
+        if (accelerometer == false)
+        {
+        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei k‰ytett‰viss‰!", Toast.LENGTH_LONG).show();
+        	//this.finish();
+        }
+        */
 	}
 
 	@Override
