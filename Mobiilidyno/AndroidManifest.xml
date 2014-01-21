@@ -34,7 +34,7 @@
         </activity>
         <activity
             android:name="fi.savonia.etx10sp.mobiilidyno.MittaustenSelausActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
         </activity>
         <activity
             android:name="fi.savonia.etx10sp.mobiilidyno.TiedotActivity"
@@ -42,7 +42,8 @@
         </activity>
         <activity
             android:name="fi.savonia.etx10sp.mobiilidyno.MittausActivity"
-            android:label="@string/title_activity_mittaus" >
+            android:label="@string/title_activity_mittaus"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
