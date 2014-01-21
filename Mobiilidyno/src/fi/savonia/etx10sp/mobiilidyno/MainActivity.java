@@ -1,19 +1,12 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
-import java.util.List;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -35,7 +28,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		this.aloitaButton = (Button)findViewById(R.id.aloitaMittausButton);
 		this.aloitaButton.setOnClickListener(this);
-		
 	}
 	
 	@Override
@@ -44,14 +36,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 		
 		initializeComponents();
-		
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-               
-        // Tarkastus onko GPS p‰‰ll‰
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-        	kytkeGPSDialog();
-        }
-        
 	}
 
 	@Override
@@ -88,34 +72,4 @@ public class MainActivity extends Activity implements OnClickListener {
 			startActivity(intent);
 		}
 	}
-	
-	public void showToast(String message)
-    {
-    	Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-    }
-	
-	// Dialogin avulla voidaan kytke‰ GPS p‰‰lle
-    private void kytkeGPSDialog(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("GPS on pois p‰‰lt‰. Haluatko kytke‰ sen p‰‰lle?")
-        .setCancelable(false)
-        .setPositiveButton("Kytke GPS p‰‰lle",
-                new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-                Intent callGPSSettingIntent = new Intent(
-                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(callGPSSettingIntent);
-            }
-        });
-        alertDialogBuilder.setNegativeButton("Peruuta",
-                new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-                dialog.cancel();
-            }
-        });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
-    }
-	
-
 }

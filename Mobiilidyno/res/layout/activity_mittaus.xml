@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="68dp"
         android:layout_marginTop="110dp"
-        android:text="@string/hello_world" />
+        android:text="" />
 
     <Button
         android:id="@+id/button_lopetaMittaus"
@@ -35,11 +35,26 @@
         android:layout_alignLeft="@+id/button_lopetaMittaus"
         android:layout_marginBottom="19dp"
         android:text="@string/nopeus" />
-    
-    <TextView
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        "
+        <TextView
 		android:id="@+id/text_accelerometer"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:text="Accelerometer: disabled" />
+		android:text="accelero" />
+    
+    <TextView
+		android:id="@+id/text_linear"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="linear" />
+
+    </LinearLayout>
+    
 
 </RelativeLayout>

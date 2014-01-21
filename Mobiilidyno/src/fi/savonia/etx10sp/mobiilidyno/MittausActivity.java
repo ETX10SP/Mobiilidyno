@@ -1,32 +1,22 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.openintents.sensorsimulator.hardware.Sensor;
-import org.openintents.sensorsimulator.hardware.SensorEvent;
-import org.openintents.sensorsimulator.hardware.SensorEventListener;
-import org.openintents.sensorsimulator.hardware.SensorManagerSimulator;
-
-import java.util.List;
-
 import android.app.Activity;
-//import android.hardware.Sensor;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
+//import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MittausActivity extends Activity {
+public class MittausActivity extends Activity implements SensorEventListener {
 
 	public class Mittaus
 	{
@@ -44,29 +34,22 @@ public class MittausActivity extends Activity {
 		}
 	}
 	
-	private SensorManagerSimulator mSensorManager;
+	private SensorManager mSensorManager;
 	
-	private SensorEventListener mEventListenerAccelerometer;
-	private SensorEventListener mEventListenerGravity;
-	private SensorEventListener mEventListenerLinearAcceleration;
-	private SensorEventListener mEventListenerLight;
-	private SensorEventListener mEventListenerTemperature;
-	private SensorEventListener mEventListenerOrientation;
-	private SensorEventListener mEventListenerMagneticField;
-	private SensorEventListener mEventListenerPressure;
-	private SensorEventListener mEventListenerRotationVector;
-	private SensorEventListener mEventListenerBarcode;
-	
-	private TextView mTextViewAccelerometer;
+	private Sensor sAccelerometer;
+	private Sensor sLinear;
+
+	private TextView linear;
+
+	private TextView accelero;
 	
 	private TextView tvLaskuri;
 	private TextView tvNopeus;
-	private Button lopetaMittaus;
+	//private Button lopetaMittaus;
 	private long laskuri = 0;
 	private long nopeus = 0;
 	
 	ArrayList<Mittaus> acceleroArray = new ArrayList<Mittaus>();
-	ArrayList<Mittaus> gravityArray = new ArrayList<Mittaus>();
 	ArrayList<Mittaus> linearAcceleroArray = new ArrayList<Mittaus>();
 	
 	private Handler mHandler = new Handler();
@@ -89,38 +72,21 @@ public class MittausActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_mittaus);
-		lopetaMittaus = (Button)findViewById(R.id.button_lopetaMittaus);
+		//lopetaMittaus = (Button)findViewById(R.id.button_lopetaMittaus);
 		tvLaskuri = (TextView)findViewById(R.id.textView_laskuri);
 		tvNopeus = (TextView)findViewById(R.id.textView_nopeus);
 		
-		mTextViewAccelerometer = (TextView)findViewById(R.id.text_accelerometer);
+		accelero = (TextView) findViewById(R.id.text_accelerometer);
+		linear = (TextView) findViewById(R.id.text_linear);
 		
 		this.laskuri = System.currentTimeMillis();
 		this.mHandler.postDelayed(mRunnable, 0);
 		
 		tvNopeus.setText("Nopeus : " + nopeus);
 		
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
-		StrictMode.setThreadPolicy(policy); 
-		
-		mSensorManager = SensorManagerSimulator.getSystemService(this,
-				SENSOR_SERVICE);
-
-		// 5) Connect to the sensor simulator, using the settings
-		// that have been set previously with SensorSimulatorSettings
-		mSensorManager.connectSimulator();
-
-		// The rest of your application can stay unmodified.
-		// //////////////////////////////////////////////////////////////
-
-		initListeners();
-		
-		/*
-        // K‰yd‰‰n l‰pi k‰ytett‰viss‰ olevat sensorit
-        Boolean accelerometer = false;
-        SensorManager mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+		mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+		Boolean accelerometer = false;
+		List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         for (int i = 0; i< deviceSensors.size(); i++) {
             if (deviceSensors.get(i).getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             	accelerometer = true;
@@ -134,7 +100,14 @@ public class MittausActivity extends Activity {
         	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei k‰ytett‰viss‰!", Toast.LENGTH_LONG).show();
         	//this.finish();
         }
-        */
+        else
+        {
+        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi lˆytyy", Toast.LENGTH_LONG).show();
+        }
+		
+		sAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		sLinear = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        
 	}
 
 	@Override
@@ -151,141 +124,73 @@ public class MittausActivity extends Activity {
 		finish();
 	}
 	
-	private void initListeners() {
-		mEventListenerAccelerometer = new SensorEventListener() {
-
-			@Override
-			public void onSensorChanged(SensorEvent event) {
-				float[] values = event.values;
-				//Log.w("a","now" + TimeUnit.MILLISECONDS.toDays(now)  + " now+1" + TimeUnit.MILLISECONDS.toDays(now+TimeUnit.MILLISECONDS.toSeconds(1000))  );
-				
-				if(acceleroArray.isEmpty())
-				{
-					acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-					Log.w("accelero", Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-				}
-				else
-				{
-					Mittaus last = acceleroArray.get(acceleroArray.size()-1);
-
-					long now = System.currentTimeMillis();
-					
-					long temp = last._TimeStamp + 1000;
-					
-					//Log.w("asd", now + " " + temp);
-					
-					if( now > temp)
-					{
-						acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-						Log.w("accelero", Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-						//mTextViewAccelerometer.setText("Accelerometer: " + Math.round(values[0] * 1000.0) / 1000.0 + ", " + Math.round(values[1] * 1000.0) / 1000.0 + ", " + Math.round(values[2] * 1000.0) / 1000.0 + ", " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-					}
-					
-					//val[1] = values[1]; val[0] = values[0]; val[2] = values[2];
-					//mTextViewAccelerometer.setText("Accelerometer: " + Math.round(values[0] * 1000.0) / 1000.0 + ", " + Math.round(values[1] * 1000.0) / 1000.0 + ", " + Math.round(values[2] * 1000.0) / 1000.0 + ", " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-				}
-			}
-
-			@Override
-			public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			}
-		};
-		
-		mEventListenerGravity = new SensorEventListener() {
-			@Override
-			public void onSensorChanged(SensorEvent event) {
-				
-				float[] values = event.values;
-				//Log.w("a","now" + TimeUnit.MILLISECONDS.toDays(now)  + " now+1" + TimeUnit.MILLISECONDS.toDays(now+TimeUnit.MILLISECONDS.toSeconds(1000))  );
-				
-				if(gravityArray.isEmpty())
-				{
-					gravityArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-					Log.w("gravity", Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-				}
-				else
-				{
-					Mittaus last = gravityArray.get(gravityArray.size()-1);
-
-					long now = System.currentTimeMillis();
-					
-					long temp = last._TimeStamp + 1000;
-					
-					//Log.w("asd", now + " " + temp);
-					
-					if( now > temp)
-					{
-						gravityArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-						Log.w("gravity", Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-					}
-					
-					//mTextViewAccelerometer.setText("Accelerometer: " + Math.round(values[0] * 1000.0) / 1000.0 + ", " + Math.round(values[1] * 1000.0) / 1000.0 + ", " + Math.round(values[2] * 1000.0) / 1000.0 + ", " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-				}
-			}
-
-			@Override
-			public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			}
-		};
-		
-		mEventListenerLinearAcceleration = new SensorEventListener() {
-			@Override
-			public void onSensorChanged(SensorEvent event) {
-				
-				float[] values = event.values;
-				//Log.w("a","now" + TimeUnit.MILLISECONDS.toDays(now)  + " now+1" + TimeUnit.MILLISECONDS.toDays(now+TimeUnit.MILLISECONDS.toSeconds(1000))  );
-				
-				if(linearAcceleroArray.isEmpty())
-				{
-					linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-					Log.w("linear", Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-				}
-				else
-				{
-					Mittaus last = linearAcceleroArray.get(linearAcceleroArray.size()-1);
-
-					long now = System.currentTimeMillis();
-					
-					long temp = last._TimeStamp + 1000;
-					
-					//Log.w("asd", now + " " + temp);
-					
-					if( now > temp)
-					{
-						linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-						Log.w("linear", Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-					}
-					
-					//mTextViewAccelerometer.setText("Accelerometer: " + Math.round(values[0] * 1000.0) / 1000.0 + ", " + Math.round(values[1] * 1000.0) / 1000.0 + ", " + Math.round(values[2] * 1000.0) / 1000.0 + ", " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-				}
-			}
-
-			@Override
-			public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			}
-		};
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mSensorManager.registerListener(mEventListenerAccelerometer,
-				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-				SensorManager.SENSOR_DELAY_FASTEST);
-		mSensorManager.registerListener(mEventListenerGravity,
-				mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),
-				SensorManager.SENSOR_DELAY_FASTEST);
-		mSensorManager.registerListener(mEventListenerLinearAcceleration,
-				mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-				SensorManager.SENSOR_DELAY_FASTEST);
+		
+		mSensorManager.registerListener(this, sAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, sLinear, SensorManager.SENSOR_DELAY_NORMAL);
 	}
 
 	@Override
 	protected void onStop() {
-		mSensorManager.unregisterListener(mEventListenerAccelerometer);
-		mSensorManager.unregisterListener(mEventListenerGravity);
-		mSensorManager.unregisterListener(mEventListenerLinearAcceleration);
 		super.onStop();
 	}
-	
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+		{
+			float[] values = event.values;
+			
+			if(acceleroArray.isEmpty())
+			{
+				acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
+				accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+			}
+			else
+			{
+				Mittaus last = acceleroArray.get(acceleroArray.size()-1);
+
+				long now = System.currentTimeMillis();
+				
+				long temp = last._TimeStamp + 500;
+				
+				if( now > temp)
+				{
+					acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
+					accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+				}
+			}
+		}
+			
+		if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION)
+		{
+			float[] values = event.values;
+			
+			if(linearAcceleroArray.isEmpty())
+			{
+				linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
+				linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+			}
+			else
+			{
+				Mittaus last = linearAcceleroArray.get(linearAcceleroArray.size()-1);
+
+				long now = System.currentTimeMillis();
+				
+				long temp = last._TimeStamp + 500;
+								
+				if( now > temp)
+				{
+					linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
+					linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+				}
+			}
+		}
+	}
 }
