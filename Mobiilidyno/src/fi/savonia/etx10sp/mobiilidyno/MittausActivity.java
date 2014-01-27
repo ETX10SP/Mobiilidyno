@@ -9,7 +9,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 //import android.widget.Button;
@@ -20,17 +19,17 @@ public class MittausActivity extends Activity implements SensorEventListener {
 
 	public class Mittaus
 	{
-		long _TimeStamp;
-		float _X;
-		float _Y;
-		float _Z;
+		long TimeStamp;
+		float X;
+		float Y;
+		float Z;
 		
 		public Mittaus(long TimeStamp, float X, float Y, float Z)
 		{
-			this._TimeStamp = TimeStamp;
-			this._X = X;
-			this._Y = Y;
-			this._Z = Z;
+			this.TimeStamp = TimeStamp;
+			this.X = X;
+			this.Y = Y;
+			this.Z = Z;
 		}
 	}
 	
@@ -44,10 +43,11 @@ public class MittausActivity extends Activity implements SensorEventListener {
 	private TextView accelero;
 	
 	private TextView tvLaskuri;
-	private TextView tvNopeus;
+	private TextView tvLinear;
+	private TextView tvAcce;
 	//private Button lopetaMittaus;
 	private long laskuri = 0;
-	private long nopeus = 0;
+	//private long nopeus = 0;
 	
 	ArrayList<Mittaus> acceleroArray = new ArrayList<Mittaus>();
 	ArrayList<Mittaus> linearAcceleroArray = new ArrayList<Mittaus>();
@@ -74,7 +74,8 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		setContentView(R.layout.activity_mittaus);
 		//lopetaMittaus = (Button)findViewById(R.id.button_lopetaMittaus);
 		tvLaskuri = (TextView)findViewById(R.id.textView_laskuri);
-		tvNopeus = (TextView)findViewById(R.id.textView_nopeus);
+		tvLinear = (TextView)findViewById(R.id.textView_linear);
+		tvAcce = (TextView)findViewById(R.id.textView_acce);
 		
 		accelero = (TextView) findViewById(R.id.text_accelerometer);
 		linear = (TextView) findViewById(R.id.text_linear);
@@ -82,7 +83,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		this.laskuri = System.currentTimeMillis();
 		this.mHandler.postDelayed(mRunnable, 0);
 		
-		tvNopeus.setText("Nopeus : " + nopeus);
+		//tvLinear.setText("Nopeus : " + nopeus);
 		
 		mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 		Boolean accelerometer = false;
@@ -121,7 +122,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
 	{
 		onStop();
 		mHandler.removeCallbacks(mRunnable);
-		finish();
+		//finish();
 	}
 	
 	@Override
@@ -148,6 +149,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		{
 			acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
 			accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+			Helper.appendValuesToTextBox(tvAcce, values);
 		}
 		else
 		{
@@ -155,12 +157,14 @@ public class MittausActivity extends Activity implements SensorEventListener {
 
 			long now = System.currentTimeMillis();
 			
-			long temp = last._TimeStamp + 500;
+			long temp = last.TimeStamp + 500;
 			
 			if( now > temp)
 			{
 				acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
 				accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+				
+				Helper.appendValuesToTextBox(tvAcce, values);
 			}
 		}
 	}
@@ -173,6 +177,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		{
 			linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
 			linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+			Helper.appendValuesToTextBox(tvLinear, values);
 		}
 		else
 		{
@@ -180,12 +185,13 @@ public class MittausActivity extends Activity implements SensorEventListener {
 
 			long now = System.currentTimeMillis();
 			
-			long temp = last._TimeStamp + 500;
+			long temp = last.TimeStamp + 500;
 							
 			if( now > temp)
 			{
 				linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
 				linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+				Helper.appendValuesToTextBox(tvLinear, values);
 			}
 		}
 	}
