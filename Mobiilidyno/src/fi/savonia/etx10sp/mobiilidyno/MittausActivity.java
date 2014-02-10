@@ -16,23 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MittausActivity extends Activity implements SensorEventListener {
-
-	public class Mittaus
-	{
-		long TimeStamp;
-		float X;
-		float Y;
-		float Z;
-		
-		public Mittaus(long TimeStamp, float X, float Y, float Z)
-		{
-			this.TimeStamp = TimeStamp;
-			this.X = X;
-			this.Y = Y;
-			this.Z = Z;
-		}
-	}
-	
 	private SensorManager mSensorManager;
 	
 	private Sensor sAccelerometer;
@@ -42,9 +25,12 @@ public class MittausActivity extends Activity implements SensorEventListener {
 
 	private TextView accelero;
 	
+	private String Date;
+	
 	private TextView tvLaskuri;
 	private TextView tvLinear;
 	private TextView tvAcce;
+	private TextView tvLasketut;
 	//private Button lopetaMittaus;
 	private long laskuri = 0;
 	//private long nopeus = 0;
@@ -76,6 +62,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		tvLaskuri = (TextView)findViewById(R.id.textView_laskuri);
 		tvLinear = (TextView)findViewById(R.id.textView_linear);
 		tvAcce = (TextView)findViewById(R.id.textView_acce);
+		tvLasketut = (TextView)findViewById(R.id.textView_Lasketut);
 		
 		accelero = (TextView) findViewById(R.id.text_accelerometer);
 		linear = (TextView) findViewById(R.id.text_linear);
@@ -108,7 +95,6 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		
 		sAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sLinear = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        
 	}
 
 	@Override
@@ -131,6 +117,8 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		
 		mSensorManager.registerListener(this, sAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 		mSensorManager.registerListener(this, sLinear, SensorManager.SENSOR_DELAY_NORMAL);
+		
+		this.Date = Helper.getDate(System.currentTimeMillis(), "dd_MM_yyyy_hh_mm_ss");
 	}
 
 	@Override
@@ -147,25 +135,23 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		
 		if(acceleroArray.isEmpty())
 		{
-			acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
+			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
+			
+			acceleroArray.add(m);
+			
+			Helper.writeToFile(m.toString(), "accelero_arvot_" + this.Date + ".txt");
+			
 			accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-			Helper.appendValuesToTextBox(tvAcce, values);
 		}
 		else
 		{
-			Mittaus last = acceleroArray.get(acceleroArray.size()-1);
-
-			long now = System.currentTimeMillis();
+			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
 			
-			long temp = last.TimeStamp + 500;
+			acceleroArray.add(m);
 			
-			if( now > temp)
-			{
-				acceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-				accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-				
-				Helper.appendValuesToTextBox(tvAcce, values);
-			}
+			Helper.writeToFile(m.toString(), "accelero_arvot_" + this.Date + ".txt");
+			
+			accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
 		}
 	}
 	
@@ -175,24 +161,31 @@ public class MittausActivity extends Activity implements SensorEventListener {
 		
 		if(linearAcceleroArray.isEmpty())
 		{
-			linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-			linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-			Helper.appendValuesToTextBox(tvLinear, values);
+			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
+			
+			linearAcceleroArray.add(m);
+			
+			linear.setText(linearAcceleroArray.get(linearAcceleroArray.size()-1).toString());
+			
+			Helper.writeToFile(m.toString(), "linear_arvot_" + this.Date  + ".txt");
+			
+			double t = Math.sqrt(values[0] * values [0] + values[1] * values[1] + values[2] * values[2]);
+			
+			Helper.appendValueToTextBox(tvLasketut, t);
 		}
 		else
 		{
-			Mittaus last = linearAcceleroArray.get(linearAcceleroArray.size()-1);
-
-			long now = System.currentTimeMillis();
+			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
 			
-			long temp = last.TimeStamp + 500;
-							
-			if( now > temp)
-			{
-				linearAcceleroArray.add(new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]));
-				linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-				Helper.appendValuesToTextBox(tvLinear, values);
-			}
+			linearAcceleroArray.add(m);
+			
+			linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
+			
+			Helper.writeToFile(m.toString(), "linear_arvot_" + this.Date  + ".txt");
+			
+			double t = Math.sqrt(values[0] * values [0] + values[1] * values[1] + values[2] * values[2]);
+			
+			Helper.appendValueToTextBox(tvLasketut, t);
 		}
 	}
 	

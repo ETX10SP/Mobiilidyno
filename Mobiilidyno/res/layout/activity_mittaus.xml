@@ -8,7 +8,7 @@
         android:id="@+id/text_accelerometer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="accelero" />
+        android:text="0" />
 
     <TextView
         android:id="@+id/text_linear"
@@ -55,6 +55,22 @@
                 android:layout_alignParentTop="true"
                 android:text="linear" />
 
+            <TextView 
+                android:id="@+id/textView_Lasketut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:text="abs:linear" />"
+            
+            <TextView
+                android:id="@+id/textView_acce"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:text="matka" />
+            <!--
             <TextView
                 android:id="@+id/textView_acce"
                 android:layout_width="wrap_content"
@@ -62,6 +78,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:text="accelero" />
+            -->
 
 		</RelativeLayout> 
     </ScrollView>
