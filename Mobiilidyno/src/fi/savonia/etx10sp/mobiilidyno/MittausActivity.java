@@ -1,6 +1,7 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MittausActivity extends Activity implements SensorEventListener {
+	private static final String TAG = "MittausActivity";
 	private SensorManager mSensorManager;
 	private Sensor sLinear;
 	private String Date;
@@ -73,22 +75,45 @@ public class MittausActivity extends Activity implements SensorEventListener {
             }
         }
 
-        // Suljetaan nï¿½kymï¿½ jos kiihtyvuusanturi ei ole kï¿½ytettï¿½vissï¿½
+        // Suljetaan näkymä jos kiihtyvuusanturi ei ole käytettävissä
         if (accelerometer == false)
         {
-        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei kï¿½ytettï¿½vissï¿½!", Toast.LENGTH_LONG).show();
-        	//this.finish();
+        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei käytettävissä!", Toast.LENGTH_LONG).show();
+        	this.finish();
         }
         else
         {
-        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi lï¿½ytyy", Toast.LENGTH_LONG).show();
+        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi löytyy", Toast.LENGTH_LONG).show();
         }
 
-        this.asetukset = this.getAsetukset();
-
+        this.asetukset = this.getAsetukset(true);
+        if(this.asetukset.containsKey("error"))
+        {
+        	//jos sisältää sen, tuli virhe.
+        	if(this.asetukset.get("error") == "no_settings")
+        	{
+        		//TODO: Toimiiko jos osa vain välttämättömistä asetuksista on tehty?
+        		Toast.makeText(getApplicationContext(), "Asetuksia ei ollut. Ne täytyy tehdä ennen kuin voidaan mittailla", Toast.LENGTH_LONG).show();
+        		Intent intent = new Intent(this, AsetuksetActivity.class);
+        		this.onDestroy(); //TODO: ei lopeta. Pitäisikö vanha activity lopettaa?
+        		startActivity(intent);
+        		//this.finish();	
+        	}
+        	else
+        	{
+        		//joku muu virhe, varoitetaan siitä. laitetaan rivi, jolta lähdetään, nii se löytyy nopeammin
+        		String lineNumber = Integer.toString(new Throwable().getStackTrace()[0].getLineNumber());
+        		warn("Line: "+lineNumber+" "+this.asetukset.get("error"));
+        	}
+        }      
         this.linearAcceleroArray = new MittausDataArray(this.asetukset.get("kuski"), this.asetukset.get("pyora"), this.asetukset.get("renkaat"), this.asetukset.get("valitykset"), this.Date);
 
 		sLinear = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+	}
+	
+	private void warn(String msg)
+	{
+		Log.w(TAG, msg);
 	}
 
 	@Override
@@ -180,7 +205,6 @@ public class MittausActivity extends Activity implements SensorEventListener {
             }
             else
             {
-
                 nopeus = Kaavat.laskeNopeus(prevNopeus, (kok - prevKok) / 2, (time - prevTime) / 1000);
             }
 
@@ -212,15 +236,39 @@ public class MittausActivity extends Activity implements SensorEventListener {
     }
 
     private HashMap<String, String> getAsetukset() {
+    	return getAsetukset(false);
+    }
+    
+    private HashMap<String, String> getAsetukset(boolean showError) {
         ObjectInput in;
         File f;
-        HashMap<String, String> ss=null;
+        HashMap<String, String> ss = new HashMap<String, String>();
         try {
             f = new File(Environment.getExternalStorageDirectory(), "asetukset.data");
-            in = new ObjectInputStream(new FileInputStream(f));
-            ss=(HashMap<String, String>) in.readObject();
-            in.close();
-        } catch (Exception e) {e.printStackTrace();}
+            if(f.exists())
+            {
+	            in = new ObjectInputStream(new FileInputStream(f));
+	            ss=(HashMap<String, String>) in.readObject();
+	            in.close();
+            }
+            else
+            {
+            	ss.put("error", "no_settings");
+            }
+        //} catch (FileNotFoundException e) {
+        //} catch (IOException e) {
+        } catch (Exception e) {
+        	
+        	//e.printStackTrace()
+        	if(showError == true)
+        	{
+        		ss.put("error", e.toString());
+        	}
+        	else
+        	{
+        		ss.put("error", "true");
+        	}
+        }
 
         return ss;
     }
