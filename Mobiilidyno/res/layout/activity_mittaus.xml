@@ -2,13 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/text_accelerometer"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="0" />
+    android:orientation="vertical"
+    android:id="@+id/main">
 
     <TextView
         android:id="@+id/text_linear"
@@ -39,14 +34,16 @@
 
     </RelativeLayout>
     
-    <ScrollView
+    <!--<ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content">-->
         
-        <RelativeLayout
+        <LinearLayout
+        android:orientation="vertical"
 	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" >
-
+	    android:layout_height="wrap_content"
+        android:id="@+id/leiska">
+<!--
             <TextView
                 android:id="@+id/textView_linear"
                 android:layout_width="wrap_content"
@@ -69,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:text="matka" />
+                android:text="matka" />-->
             <!--
             <TextView
                 android:id="@+id/textView_acce"
@@ -80,6 +77,6 @@
                 android:text="accelero" />
             -->
 
-		</RelativeLayout> 
-    </ScrollView>
+		</LinearLayout>
+    <!--</ScrollView>-->
 </LinearLayout>

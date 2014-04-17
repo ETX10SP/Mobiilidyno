@@ -53,7 +53,7 @@ public class Helper {
 	    try {
 	    	File file = new File(Environment.getExternalStorageDirectory(), fileName);
 	        FileWriter fw = new FileWriter(file, true);
-	        fw.write(data + "\n\n");
+	        fw.write(data);
 	        fw.flush();
 	        fw.close();
 	    }

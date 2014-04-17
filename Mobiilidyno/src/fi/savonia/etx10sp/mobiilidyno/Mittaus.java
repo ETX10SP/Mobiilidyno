@@ -1,6 +1,8 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
-public class Mittaus
+import java.io.Serializable;
+
+public class Mittaus implements Serializable
 {
 	long TimeStamp;
 	float X;

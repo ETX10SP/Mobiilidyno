@@ -1,42 +1,40 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
-import java.util.ArrayList;
-import java.util.List;
 import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-//import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GraphViewSeries;
+import com.jjoe64.graphview.LineGraphView;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MittausActivity extends Activity implements SensorEventListener {
 	private SensorManager mSensorManager;
-	
-	private Sensor sAccelerometer;
 	private Sensor sLinear;
-
-	private TextView linear;
-
-	private TextView accelero;
-	
 	private String Date;
 	
 	private TextView tvLaskuri;
-	private TextView tvLinear;
-	private TextView tvAcce;
-	private TextView tvLasketut;
-	//private Button lopetaMittaus;
+    private TextView linear;
 	private long laskuri = 0;
-	//private long nopeus = 0;
-	
-	ArrayList<Mittaus> acceleroArray = new ArrayList<Mittaus>();
-	ArrayList<Mittaus> linearAcceleroArray = new ArrayList<Mittaus>();
+    private LinearLayout leiska;
+    private HashMap<String, String> asetukset;
+
+	MittausDataArray linearAcceleroArray;
 	
 	private Handler mHandler = new Handler();
 	
@@ -58,21 +56,14 @@ public class MittausActivity extends Activity implements SensorEventListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_mittaus);
-		//lopetaMittaus = (Button)findViewById(R.id.button_lopetaMittaus);
+
 		tvLaskuri = (TextView)findViewById(R.id.textView_laskuri);
-		tvLinear = (TextView)findViewById(R.id.textView_linear);
-		tvAcce = (TextView)findViewById(R.id.textView_acce);
-		tvLasketut = (TextView)findViewById(R.id.textView_Lasketut);
-		
-		accelero = (TextView) findViewById(R.id.text_accelerometer);
+        leiska = (LinearLayout)findViewById(R.id.leiska);
+        this.Date = Helper.getDate(System.currentTimeMillis(), "dd_MM_yyyy_hh_mm_ss");
 		linear = (TextView) findViewById(R.id.text_linear);
-		
-		this.laskuri = System.currentTimeMillis();
-		this.mHandler.postDelayed(mRunnable, 0);
-		
-		//tvLinear.setText("Nopeus : " + nopeus);
-		
+
 		mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+
 		Boolean accelerometer = false;
 		List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         for (int i = 0; i< deviceSensors.size(); i++) {
@@ -81,19 +72,22 @@ public class MittausActivity extends Activity implements SensorEventListener {
                 break;
             }
         }
-        
-        // Suljetaan näkymä jos kiihtyvuusanturi ei ole käytettävissä
+
+        // Suljetaan nï¿½kymï¿½ jos kiihtyvuusanturi ei ole kï¿½ytettï¿½vissï¿½
         if (accelerometer == false)
         {
-        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei käytettävissä!", Toast.LENGTH_LONG).show();
+        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei kï¿½ytettï¿½vissï¿½!", Toast.LENGTH_LONG).show();
         	//this.finish();
         }
         else
         {
-        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi löytyy", Toast.LENGTH_LONG).show();
+        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi lï¿½ytyy", Toast.LENGTH_LONG).show();
         }
-		
-		sAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        this.asetukset = this.getAsetukset();
+
+        this.linearAcceleroArray = new MittausDataArray(this.asetukset.get("kuski"), this.asetukset.get("pyora"), this.asetukset.get("renkaat"), this.asetukset.get("valitykset"), this.Date);
+
 		sLinear = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 	}
 
@@ -114,79 +108,36 @@ public class MittausActivity extends Activity implements SensorEventListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		mSensorManager.registerListener(this, sAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-		mSensorManager.registerListener(this, sLinear, SensorManager.SENSOR_DELAY_NORMAL);
-		
-		this.Date = Helper.getDate(System.currentTimeMillis(), "dd_MM_yyyy_hh_mm_ss");
+
+        if(this.laskuri == 0) {
+            this.laskuri = System.currentTimeMillis();
+            this.mHandler.postDelayed(mRunnable, 0);
+            mSensorManager.registerListener(this, sLinear, SensorManager.SENSOR_DELAY_NORMAL);
+        }
 	}
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(this);
+    }
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		
-		mSensorManager.unregisterListener(this, sAccelerometer);
-		mSensorManager.unregisterListener(this,sLinear);
-	}
-	
-	public void AcceleroMeter(SensorEvent event)
-	{
-		float[] values = event.values;
-		
-		if(acceleroArray.isEmpty())
-		{
-			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
-			
-			acceleroArray.add(m);
-			
-			Helper.writeToFile(m.toString(), "accelero_arvot_" + this.Date + ".txt");
-			
-			accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-		}
-		else
-		{
-			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
-			
-			acceleroArray.add(m);
-			
-			Helper.writeToFile(m.toString(), "accelero_arvot_" + this.Date + ".txt");
-			
-			accelero.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-		}
-	}
-	
-	public void LinearAcceleroMeter(SensorEvent event)
-	{
-		float[] values = event.values;
-		
-		if(linearAcceleroArray.isEmpty())
-		{
-			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
-			
-			linearAcceleroArray.add(m);
-			
-			linear.setText(linearAcceleroArray.get(linearAcceleroArray.size()-1).toString());
-			
-			Helper.writeToFile(m.toString(), "linear_arvot_" + this.Date  + ".txt");
-			
-			double t = Math.sqrt(values[0] * values [0] + values[1] * values[1] + values[2] * values[2]);
-			
-			Helper.appendValueToTextBox(tvLasketut, t);
-		}
-		else
-		{
-			Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
-			
-			linearAcceleroArray.add(m);
-			
-			linear.setText("" + Helper.getDate(System.currentTimeMillis(), "dd/MM/yyyy hh:mm:ss.SSS") + " : " + values[0] + " " +values[1] + " " + values[2]);
-			
-			Helper.writeToFile(m.toString(), "linear_arvot_" + this.Date  + ".txt");
-			
-			double t = Math.sqrt(values[0] * values [0] + values[1] * values[1] + values[2] * values[2]);
-			
-			Helper.appendValueToTextBox(tvLasketut, t);
-		}
+
+        String linear = "";
+
+        for (Mittaus m : this.linearAcceleroArray)
+        {
+            linear += m.toString() + "\n";
+        }
+
+        //Helper.writeToFile(linear.trim(), "linear_" + this.Date + ".txt");
+
+		mSensorManager.unregisterListener(this);
+
+        drawGraph();
 	}
 	
 	@Override
@@ -194,15 +145,115 @@ public class MittausActivity extends Activity implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		
-		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-		{
-			AcceleroMeter(event);
-		}
-			
 		if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION)
 		{
-			LinearAcceleroMeter(event);
+            float[] values = event.values;
+
+            linear.setText(values[0] + " " + values[1] + " " + values[2]);
+
+            Mittaus m = new Mittaus(System.currentTimeMillis(), values[0], values[1], values[2]);
+
+            linearAcceleroArray.add(m);
 		}
 	}
+
+    public void drawGraph() {
+
+        ArrayList<GraphView.GraphViewData> acc = new ArrayList<GraphView.GraphViewData>();
+
+        Mittaus prev = null;
+        double prevNopeus = 0;
+        double prevTime = 0;
+        double prevKok = 0;
+
+        for(Mittaus m : this.linearAcceleroArray)
+        {
+            double time = m.TimeStamp - this.linearAcceleroArray.get(0).TimeStamp;
+
+            double kok = Kaavat.laskeKokonaiskiihtyvyys(m.X - this.linearAcceleroArray.get(0).X, m.Y - this.linearAcceleroArray.get(0).Y, m.Z - this.linearAcceleroArray.get(0).Z);
+
+            double nopeus;
+
+            if(prev == null)
+            {
+                nopeus = Kaavat.laskeNopeus(0, (kok / 2), time);
+            }
+            else
+            {
+
+                nopeus = Kaavat.laskeNopeus(prevNopeus, (kok - prevKok) / 2, (time - prevTime) / 1000);
+            }
+
+            double massa = Double.parseDouble(this.asetukset.get("kuski")) + Double.parseDouble(this.asetukset.get("pyora"));
+
+            double teho = Kaavat.laskeTeho(massa, kok, nopeus);
+
+            acc.add(new GraphView.GraphViewData(time, teho));
+
+            prev = m;
+            prevNopeus = nopeus;
+            prevTime = time;
+            prevKok = kok;
+        }
+
+        GraphView graphView = new LineGraphView(
+                this // context
+                , "Teho" // heading
+        );
+
+        GraphViewSeries accSeries = new GraphViewSeries(acc.toArray(new GraphView.GraphViewData[acc.size()]));
+
+        graphView.addSeries(accSeries); // data
+
+        save(this.linearAcceleroArray);
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.main);
+        leiska.addView(graphView);
+    }
+
+    private HashMap<String, String> getAsetukset() {
+        ObjectInput in;
+        File f;
+        HashMap<String, String> ss=null;
+        try {
+            f = new File(Environment.getExternalStorageDirectory(), "asetukset.data");
+            in = new ObjectInputStream(new FileInputStream(f));
+            ss=(HashMap<String, String>) in.readObject();
+            in.close();
+        } catch (Exception e) {e.printStackTrace();}
+
+        return ss;
+    }
+
+    private void save(MittausDataArray dataArray)
+    {
+        ObjectInputStream in;
+        ObjectOutputStream out;
+        FileInputStream fin;
+        FileOutputStream fout;
+        File f;
+        HashMap<String, MittausDataArray> ss = null;
+
+        try {
+            f = new File(Environment.getExternalStorageDirectory(), "mittaukset.data");
+
+            if(f.exists()) {
+                in = new ObjectInputStream(new FileInputStream(f));
+                ss = (HashMap<String, MittausDataArray>) in.readObject();
+                ss.put(this.Date, dataArray);
+                in.close();
+            }
+            else {
+                ss = new HashMap<String, MittausDataArray>();
+                ss.put(this.Date, dataArray);
+            }
+
+            out = new ObjectOutputStream(new FileOutputStream(f));
+            out.writeObject(ss);
+            out.close();
+
+        } catch (Exception e) {
+            Log.w("error", e.toString());
+        }
+    }
 }
