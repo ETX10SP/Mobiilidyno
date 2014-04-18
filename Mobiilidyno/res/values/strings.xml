@@ -19,5 +19,10 @@
     <string name="title_activity_mittaus">MittausActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="nopeus">Nopeus</string>
+    <string-array name="suureet_array">
+        <item>Teho</item>
+        <item>Nopeus</item>
+        <item>Kiihtyvyys</item>
+    </string-array>
 
 </resources>

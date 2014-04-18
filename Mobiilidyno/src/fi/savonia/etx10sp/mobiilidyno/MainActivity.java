@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		else if (v.equals(this.tietojaButton))
 		{
-			intent = new Intent(this, TiedotActivity.class);	
+			intent = new Intent(this, TiedotActivity.class);
 		}
 		
 		if (intent != null)

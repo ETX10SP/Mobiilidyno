@@ -2,6 +2,7 @@ package fi.savonia.etx10sp.mobiilidyno;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GraphViewSeries;
@@ -11,12 +12,14 @@ import java.util.HashMap;
 
 /**
  * Created by s06863 on 17.4.2014.
+ * Edited by s04101 on 19.4.2014.
  */
 public class NaytaMittausActivity extends Activity {
-
+	private static final String TAG = "NaytaMittausActivity";
     MittausDataArray linearAcceleroArray;
     ArrayList<Mittaus> a;
-
+    private String suure = "Kikkeli"; //N‰ytet‰‰n teho oletuksena
+    
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nayta_mittaus);
@@ -30,6 +33,9 @@ public class NaytaMittausActivity extends Activity {
         this.linearAcceleroArray = new MittausDataArray(asetukset.get("kuski"), asetukset.get("pyora"), asetukset.get("renkaat"), asetukset.get("valitykset"), asetukset.get("date"));
 
         this.linearAcceleroArray.addAll(a);
+        
+        Bundle extras = getIntent().getExtras();
+        suure = extras != null ? extras.getString("suure") : suure;
 
         drawGraph();
     }
@@ -57,15 +63,24 @@ public class NaytaMittausActivity extends Activity {
             }
             else
             {
-
                 nopeus = Kaavat.laskeNopeus(prevNopeus, (kok - prevKok) / 2, (time - prevTime) / 1000);
             }
 
-            double massa = Double.parseDouble(this.linearAcceleroArray.kuskinPaino) + Double.parseDouble(this.linearAcceleroArray.pyoranPaino);
-
-            double teho = Kaavat.laskeTeho(massa, kok, nopeus);
-
-            acc.add(new GraphView.GraphViewData(time, teho));
+            if(suure == "Nopeus")
+            {
+            	acc.add(new GraphView.GraphViewData(time, nopeus));
+            }
+            else if(suure == "Kiihtyvyys")
+            {
+            	acc.add(new GraphView.GraphViewData(time, kok));
+            }
+            else
+            { 
+	            double massa = Double.parseDouble(this.linearAcceleroArray.kuskinPaino) + Double.parseDouble(this.linearAcceleroArray.pyoranPaino);
+	            double teho = Kaavat.laskeTeho(massa, kok, nopeus);
+	
+	            acc.add(new GraphView.GraphViewData(time, teho));
+            }
 
             prev = m;
             prevNopeus = nopeus;
@@ -75,7 +90,7 @@ public class NaytaMittausActivity extends Activity {
 
         GraphView graphView = new LineGraphView(
                 this // context
-                , "Teho" // heading
+                , suure // heading
         );
 
         GraphViewSeries accSeries = new GraphViewSeries(acc.toArray(new GraphView.GraphViewData[acc.size()]));

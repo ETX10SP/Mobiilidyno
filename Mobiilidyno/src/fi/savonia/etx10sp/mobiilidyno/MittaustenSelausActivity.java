@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.*;
+import android.widget.AdapterView.OnItemSelectedListener;
+
 import com.jjoe64.graphview.GraphViewSeries;
 
 import java.io.File;
@@ -17,8 +20,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MittaustenSelausActivity extends Activity {
-
+public class MittaustenSelausActivity extends Activity implements OnItemSelectedListener {
+	private static final String TAG = "MittaustenSelausActivity";
+	private String suure = "Teho";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,6 +31,30 @@ public class MittaustenSelausActivity extends Activity {
 
         ListView list = (ListView)findViewById(R.id.list);
 
+        Spinner spinner = (Spinner)findViewById(R.id.spinner_suure);
+        ArrayAdapter<CharSequence> arr_adapter = ArrayAdapter.createFromResource(this, R.array.suureet_array, android.R.layout.simple_spinner_item);
+        arr_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arr_adapter);
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener(){
+        	protected Adapter initializedAdapter = null;
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				if(initializedAdapter != parent.getAdapter()) {
+					initializedAdapter = parent.getAdapter();
+					return;
+				}
+				
+				suure = parent.getItemAtPosition(position).toString();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        });
+        
         ObjectInput in;
         File f;
         HashMap<String, MittausDataArray> hashMapMittausData = null;
@@ -36,8 +65,7 @@ public class MittaustenSelausActivity extends Activity {
                 in = new ObjectInputStream(new FileInputStream(f));
                 hashMapMittausData = (HashMap<String, MittausDataArray>) in.readObject();
                 in.close();
-            }
-            else {
+            } else {
                 // MITTAUKSIA EI OLE
             }
         } catch (Exception e) {e.printStackTrace();}
@@ -52,16 +80,15 @@ public class MittaustenSelausActivity extends Activity {
                 item.put("time", Data.get(s).date);
                 array.add(item);
             }
-        }
-        else {
+        } else {
             HashMap<String, String> item = new HashMap<String, String>();
             item.put("time", "Ei mittauksia");
             array.add(item);
         }
 
-        SimpleAdapter adapter = new SimpleAdapter(this, array, android.R.layout.simple_list_item_1, new String[] { "time" }, new int[] { android.R.id.text1 } );
+        SimpleAdapter sadapter = new SimpleAdapter(this, array, android.R.layout.simple_list_item_1, new String[] { "time" }, new int[] { android.R.id.text1 } );
 
-        list.setAdapter(adapter);
+        list.setAdapter(sadapter);
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -72,10 +99,11 @@ public class MittaustenSelausActivity extends Activity {
 
                 if(!clicked.getText().equals("Ei mittauksia")) {
                     Intent intent = new Intent(MittaustenSelausActivity.this, NaytaMittausActivity.class);
+                    intent.putExtra("suure", suure);
                     Bundle b = new Bundle();
 
                     /*
-                    Jostain syyst√§ ei MittausDataArray Ei mene sellaisenaan vaan ainoastaan ArrayList<Mittaus> menee
+                    Jostain syyst‰ ei MittausDataArray. Ei mene sellaisenaan vaan ainoastaan ArrayList<Mittaus> menee
                     Asetukset siis laitettava erikseen
                      */
                     MittausDataArray mittausData = Data.get(clicked.getText());
@@ -95,7 +123,13 @@ public class MittaustenSelausActivity extends Activity {
             }
         });
 	}
-
+	
+	
+	public void warn(String msg)
+	{
+		Log.w(TAG, msg);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -103,4 +137,15 @@ public class MittaustenSelausActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+		//Ei mene koskaan t‰nne
+		suure = parent.getItemAtPosition(position).toString();
+	}	
+
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		// TODO Auto-generated method stub
+		
+	}
 }
