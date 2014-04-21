@@ -53,18 +53,9 @@ public class NaytaMittausActivity extends Activity {
         {
             double time = m.TimeStamp - this.linearAcceleroArray.get(0).TimeStamp;
 
-            double kok = Kaavat.laskeKokonaiskiihtyvyys(m.X - this.linearAcceleroArray.get(0).X, m.Y - this.linearAcceleroArray.get(0).Y, m.Z - this.linearAcceleroArray.get(0).Z);
+            double kok = Kaavat.laskeKokonaiskiihtyvyys(m.X, m.Y, m.Z);
 
-            double nopeus;
-
-            if(prev == null)
-            {
-                nopeus = Kaavat.laskeNopeus(0, (kok / 2), time);
-            }
-            else
-            {
-                nopeus = Kaavat.laskeNopeus(prevNopeus, (kok - prevKok) / 2, (time - prevTime) / 1000);
-            }
+            double nopeus = Kaavat.laskeNopeus(prevNopeus, (kok + prevKok) / 2, (time - prevTime) / 1000);
 
             if(suure == "Nopeus")
             {
@@ -77,7 +68,7 @@ public class NaytaMittausActivity extends Activity {
             else
             { 
 	            double massa = Double.parseDouble(this.linearAcceleroArray.kuskinPaino) + Double.parseDouble(this.linearAcceleroArray.pyoranPaino);
-	            double teho = Kaavat.laskeTeho(massa, kok, nopeus);
+	            double teho = Kaavat.laskeTehoWatteina(massa, kok, nopeus);
 	
 	            acc.add(new GraphView.GraphViewData(time, teho));
             }

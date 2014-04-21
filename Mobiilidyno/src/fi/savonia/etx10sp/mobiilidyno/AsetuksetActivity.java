@@ -33,8 +33,8 @@ public class AsetuksetActivity extends Activity implements OnClickListener {
 		this.asetuksetTallennaButton.setOnClickListener(this);
 		this.pyoranPaino = (EditText) findViewById(R.id.pyoranPainoEditText);
 		this.kuskinPaino = (EditText) findViewById(R.id.kuskinPainoEditText);
-		this.renkaat = (EditText) findViewById(R.id.renkaidenKokoEditText);
-		this.valitysSuhteet = (EditText) findViewById(R.id.valitysSuhteetEditText);
+		//this.renkaat = (EditText) findViewById(R.id.renkaidenKokoEditText);
+		//this.valitysSuhteet = (EditText) findViewById(R.id.valitysSuhteetEditText);
 	}
 	
 	@Override
@@ -64,8 +64,8 @@ public class AsetuksetActivity extends Activity implements OnClickListener {
 		
 		asetukset.put("kuski", this.kuskinPaino.getText().toString());
 		asetukset.put("pyora", this.pyoranPaino.getText().toString());
-		asetukset.put("renkaat", this.renkaat.getText().toString());
-		asetukset.put("valitykset", this.valitysSuhteet.getText().toString());
+		//asetukset.put("renkaat", this.renkaat.getText().toString());
+		//asetukset.put("valitykset", this.valitysSuhteet.getText().toString());
 		
 		try {
 			f = new File(Environment.getExternalStorageDirectory(), "asetukset.data");
@@ -99,8 +99,8 @@ public class AsetuksetActivity extends Activity implements OnClickListener {
 	    {
 	    	this.kuskinPaino.setText(ss.get("kuski"));
 	    	this.pyoranPaino.setText(ss.get("pyora"));
-	    	this.renkaat.setText(ss.get("renkaat"));
-	    	this.valitysSuhteet.setText(ss.get("valitykset"));
+	    	//this.renkaat.setText(ss.get("renkaat"));
+	    	//this.valitysSuhteet.setText(ss.get("valitykset"));
 	    }
 	}
 	

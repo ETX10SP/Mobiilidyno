@@ -79,7 +79,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
         if (accelerometer == false)
         {
         	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei k‰ytett‰viss‰!", Toast.LENGTH_LONG).show();
-        	this.finish();
+        	//this.finish();
         }
         else
         {
@@ -127,7 +127,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
 	{
 		onStop();
 		mHandler.removeCallbacks(mRunnable);
-		//finish();
+		finish();
 	}
 	
 	@Override
@@ -187,37 +187,31 @@ public class MittausActivity extends Activity implements SensorEventListener {
         ArrayList<GraphView.GraphViewData> acc = new ArrayList<GraphView.GraphViewData>();
 
         Mittaus prev = null;
+        
         double prevNopeus = 0;
         double prevTime = 0;
-        double prevKok = 0;
+        double prevKokonaiskiihtyvyys = 0;
+        double massa_kg = Double.parseDouble(this.asetukset.get("kuski")) + Double.parseDouble(this.asetukset.get("pyora"));
 
         for(Mittaus m : this.linearAcceleroArray)
         {
+        	// Aika nyt - aika mittauksen alussa
             double time = m.TimeStamp - this.linearAcceleroArray.get(0).TimeStamp;
+            
+            // Kokonaiskiihtyvyys (koska sensori on tyyppi‰ LINEAR_ACCELERATION, ei tarvitse kalibroida (v‰hent‰‰ alkuarvoja))
+            double kokonaisKiihtyvyys = Kaavat.laskeKokonaiskiihtyvyys(m.X, m.Y, m.Z);
 
-            double kok = Kaavat.laskeKokonaiskiihtyvyys(m.X - this.linearAcceleroArray.get(0).X, m.Y - this.linearAcceleroArray.get(0).Y, m.Z - this.linearAcceleroArray.get(0).Z);
+            // Nopeus nyt = alkunopeus + ((kokonaiskiihtyvyys nyt + kokonaiskiihtyvyys edellinen) / 2) * (aika nyt - aika edellinen) (millisekunnit sekunneiksi)
+            double nopeus_ms = Kaavat.laskeNopeus(prevNopeus, (kokonaisKiihtyvyys + prevKokonaiskiihtyvyys) / 2, (time - prevTime) / 1000);
 
-            double nopeus;
+            double tehoW = Kaavat.laskeTehoWatteina(massa_kg, kokonaisKiihtyvyys, nopeus_ms);
 
-            if(prev == null)
-            {
-                nopeus = Kaavat.laskeNopeus(0, (kok / 2), time);
-            }
-            else
-            {
-                nopeus = Kaavat.laskeNopeus(prevNopeus, (kok - prevKok) / 2, (time - prevTime) / 1000);
-            }
-
-            double massa = Double.parseDouble(this.asetukset.get("kuski")) + Double.parseDouble(this.asetukset.get("pyora"));
-
-            double teho = Kaavat.laskeTeho(massa, kok, nopeus);
-
-            acc.add(new GraphView.GraphViewData(time, teho));
+            acc.add(new GraphView.GraphViewData(time, tehoW));
 
             prev = m;
-            prevNopeus = nopeus;
+            prevNopeus = nopeus_ms;
             prevTime = time;
-            prevKok = kok;
+            prevKokonaiskiihtyvyys = kokonaisKiihtyvyys;
         }
 
         GraphView graphView = new LineGraphView(
