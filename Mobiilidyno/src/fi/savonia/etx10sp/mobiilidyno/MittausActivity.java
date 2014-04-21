@@ -79,7 +79,7 @@ public class MittausActivity extends Activity implements SensorEventListener {
         if (accelerometer == false)
         {
         	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei käytettävissä!", Toast.LENGTH_LONG).show();
-        	//this.finish();
+        	this.finish();
         }
         else
         {
