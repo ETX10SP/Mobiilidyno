@@ -20,4 +20,10 @@ public class MittausDataArray extends ArrayList<Mittaus> implements Serializable
         this.valitykset = valitykset;
         this.date = date;
     }
+
+    public MittausDataArray(String kPaino, String pPaino, String date) {
+        this.kuskinPaino = kPaino;
+        this.pyoranPaino = pPaino;
+        this.date = date;
+    }
 }

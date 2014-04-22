@@ -24,8 +24,8 @@ public class AsetuksetActivity extends Activity implements OnClickListener {
 	Button asetuksetTallennaButton;
 	EditText pyoranPaino;
 	EditText kuskinPaino;
-	EditText renkaat;
-	EditText valitysSuhteet;
+	//EditText renkaat;
+	//EditText valitysSuhteet;
 	
 	void initializeComponents()
 	{

@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MittaustenSelausActivity extends Activity implements OnItemSelectedListener {
 	private static final String TAG = "MittaustenSelausActivity";
-	private String suure = "Teho";
+	private String suure = "Kaikki";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class MittaustenSelausActivity extends Activity implements OnItemSelected
                     Bundle b = new Bundle();
 
                     /*
-                    Jostain syystä ei MittausDataArray. Ei mene sellaisenaan vaan ainoastaan ArrayList<Mittaus> menee
+                    Jostain syystï¿½ ei MittausDataArray. Ei mene sellaisenaan vaan ainoastaan ArrayList<Mittaus> menee
                     Asetukset siis laitettava erikseen
                      */
                     MittausDataArray mittausData = Data.get(clicked.getText());
@@ -139,7 +139,7 @@ public class MittaustenSelausActivity extends Activity implements OnItemSelected
 
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-		//Ei mene koskaan tänne
+		//Ei mene koskaan tï¿½nne
 		suure = parent.getItemAtPosition(position).toString();
 	}	
 

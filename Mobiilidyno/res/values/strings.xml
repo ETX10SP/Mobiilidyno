@@ -20,9 +20,11 @@
     <string name="hello_world">Hello world!</string>
     <string name="nopeus">Nopeus</string>
     <string-array name="suureet_array">
+        <item>Kaikki</item>
         <item>Teho</item>
         <item>Nopeus</item>
         <item>Kiihtyvyys</item>
     </string-array>
+    <string name="tiedot">Versio: 0.1\n\nTekijät: Aku Parviainen, Jesse Valle, Saku Kaarakainen\n\nLuokka: ETX10SP\n\n(c)Savonia AMK</string>
 
 </resources>

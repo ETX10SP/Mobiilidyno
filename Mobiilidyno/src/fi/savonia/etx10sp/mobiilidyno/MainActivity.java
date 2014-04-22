@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import java.util.HashMap;
+
 public class MainActivity extends Activity implements OnClickListener {
 
 	Button aloitaButton;
@@ -52,7 +54,17 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		if(v.equals(this.aloitaButton))
 		{
-			intent = new Intent(this, MittausActivity.class);
+
+
+            HashMap<String, String> asetukset = Helper.getAsetukset(false);
+            if(asetukset.containsKey("error"))
+            {
+                Helper.showToast("Tarkasta asetukset!", this);
+            }
+            else
+            {
+                intent = new Intent(this, MittausActivity.class);
+            }
 		}
 		else if(v.equals(this.asetuksetButton))
 		{

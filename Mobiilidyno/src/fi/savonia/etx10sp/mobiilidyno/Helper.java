@@ -1,14 +1,9 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 import fi.savonia.etx10sp.mobiilidyno.Mittaus;
 
@@ -106,4 +101,39 @@ public class Helper {
 		
 		t.setText(s+"\n"+ f1);
 	}
+
+    public static HashMap<String, String> getAsetukset(boolean showError)
+    {
+        ObjectInput in;
+        File f;
+        HashMap<String, String> ss = new HashMap<String, String>();
+        try {
+            f = new File(Environment.getExternalStorageDirectory(), "asetukset.data");
+            if(f.exists())
+            {
+                in = new ObjectInputStream(new FileInputStream(f));
+                ss=(HashMap<String, String>) in.readObject();
+                in.close();
+            }
+            else
+            {
+                ss.put("error", "no_settings");
+            }
+            //} catch (FileNotFoundException e) {
+            //} catch (IOException e) {
+        } catch (Exception e) {
+
+            //e.printStackTrace()
+            if(showError == true)
+            {
+                ss.put("error", e.toString());
+            }
+            else
+            {
+                ss.put("error", "true");
+            }
+        }
+
+        return ss;
+    }
 }

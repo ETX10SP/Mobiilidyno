@@ -15,9 +15,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GraphViewSeries;
-import com.jjoe64.graphview.LineGraphView;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -75,38 +72,16 @@ public class MittausActivity extends Activity implements SensorEventListener {
             }
         }
 
-        // Suljetaan n‰kym‰ jos kiihtyvuusanturi ei ole k‰ytett‰viss‰
+        // Suljetaan n√§kym√§ jos kiihtyvuusanturi ei ole k√§ytett√§viss√§
         if (accelerometer == false)
         {
-        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi ei k‰ytett‰viss‰!", Toast.LENGTH_LONG).show();
+        	Helper.showToast("Kiihtyvyysanturi (LINEAR_ACCLEROMETER) ei k√§ytett√§viss√§!", this);
         	this.finish();
-        }
-        else
-        {
-        	Toast.makeText(getApplicationContext(), "Kiihtyvyysanturi lˆytyy", Toast.LENGTH_LONG).show();
         }
 
         this.asetukset = this.getAsetukset(true);
-        if(this.asetukset.containsKey("error"))
-        {
-        	//jos sis‰lt‰‰ sen, tuli virhe.
-        	if(this.asetukset.get("error") == "no_settings")
-        	{
-        		//TODO: Toimiiko jos osa vain v‰ltt‰m‰ttˆmist‰ asetuksista on tehty?
-        		Toast.makeText(getApplicationContext(), "Asetuksia ei ollut. Ne t‰ytyy tehd‰ ennen kuin voidaan mittailla", Toast.LENGTH_LONG).show();
-        		Intent intent = new Intent(this, AsetuksetActivity.class);
-        		this.onDestroy(); //TODO: ei lopeta. Pit‰isikˆ vanha activity lopettaa?
-        		startActivity(intent);
-        		//this.finish();	
-        	}
-        	else
-        	{
-        		//joku muu virhe, varoitetaan siit‰. laitetaan rivi, jolta l‰hdet‰‰n, nii se lˆytyy nopeammin
-        		String lineNumber = Integer.toString(new Throwable().getStackTrace()[0].getLineNumber());
-        		warn("Line: "+lineNumber+" "+this.asetukset.get("error"));
-        	}
-        }      
-        this.linearAcceleroArray = new MittausDataArray(this.asetukset.get("kuski"), this.asetukset.get("pyora"), this.asetukset.get("renkaat"), this.asetukset.get("valitykset"), this.Date);
+
+        this.linearAcceleroArray = new MittausDataArray(this.asetukset.get("kuski"), this.asetukset.get("pyora"), this.Date);
 
 		sLinear = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 	}
@@ -151,6 +126,8 @@ public class MittausActivity extends Activity implements SensorEventListener {
 	protected void onStop() {
 		super.onStop();
 
+        /*
+        // TEKSTITIEDOSTOON KIRJOITUS
         String linear = "";
 
         for (Mittaus m : this.linearAcceleroArray)
@@ -158,11 +135,14 @@ public class MittausActivity extends Activity implements SensorEventListener {
             linear += m.toString() + "\n";
         }
 
-        //Helper.writeToFile(linear.trim(), "linear_" + this.Date + ".txt");
+        Helper.writeToFile(linear.trim(), "linear_" + this.Date + ".txt");
+        */
 
 		mSensorManager.unregisterListener(this);
 
-        drawGraph();
+        this.save(this.linearAcceleroArray);
+
+        Helper.showToast("Mittaus suoritettu. Voit tarkastella mittausta mittausten selauksen kautta", this);
 	}
 	
 	@Override
@@ -181,53 +161,6 @@ public class MittausActivity extends Activity implements SensorEventListener {
             linearAcceleroArray.add(m);
 		}
 	}
-
-    public void drawGraph() {
-
-        ArrayList<GraphView.GraphViewData> acc = new ArrayList<GraphView.GraphViewData>();
-
-        Mittaus prev = null;
-        
-        double prevNopeus = 0;
-        double prevTime = 0;
-        double prevKokonaiskiihtyvyys = 0;
-        double massa_kg = Double.parseDouble(this.asetukset.get("kuski")) + Double.parseDouble(this.asetukset.get("pyora"));
-
-        for(Mittaus m : this.linearAcceleroArray)
-        {
-        	// Aika nyt - aika mittauksen alussa
-            double time = m.TimeStamp - this.linearAcceleroArray.get(0).TimeStamp;
-            
-            // Kokonaiskiihtyvyys (koska sensori on tyyppi‰ LINEAR_ACCELERATION, ei tarvitse kalibroida (v‰hent‰‰ alkuarvoja))
-            double kokonaisKiihtyvyys = Kaavat.laskeKokonaiskiihtyvyys(m.X, m.Y, m.Z);
-
-            // Nopeus nyt = alkunopeus + ((kokonaiskiihtyvyys nyt + kokonaiskiihtyvyys edellinen) / 2) * (aika nyt - aika edellinen) (millisekunnit sekunneiksi)
-            double nopeus_ms = Kaavat.laskeNopeus(prevNopeus, (kokonaisKiihtyvyys + prevKokonaiskiihtyvyys) / 2, (time - prevTime) / 1000);
-
-            double tehoW = Kaavat.laskeTehoWatteina(massa_kg, kokonaisKiihtyvyys, nopeus_ms);
-
-            acc.add(new GraphView.GraphViewData(time, tehoW));
-
-            prev = m;
-            prevNopeus = nopeus_ms;
-            prevTime = time;
-            prevKokonaiskiihtyvyys = kokonaisKiihtyvyys;
-        }
-
-        GraphView graphView = new LineGraphView(
-                this // context
-                , "Teho" // heading
-        );
-
-        GraphViewSeries accSeries = new GraphViewSeries(acc.toArray(new GraphView.GraphViewData[acc.size()]));
-
-        graphView.addSeries(accSeries); // data
-
-        save(this.linearAcceleroArray);
-
-        LinearLayout layout = (LinearLayout) findViewById(R.id.main);
-        leiska.addView(graphView);
-    }
 
     private HashMap<String, String> getAsetukset() {
     	return getAsetukset(false);
@@ -271,8 +204,6 @@ public class MittausActivity extends Activity implements SensorEventListener {
     {
         ObjectInputStream in;
         ObjectOutputStream out;
-        FileInputStream fin;
-        FileOutputStream fout;
         File f;
         HashMap<String, MittausDataArray> ss = null;
 
