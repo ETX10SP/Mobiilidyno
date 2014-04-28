@@ -25,25 +25,27 @@ public final class R {
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
+        public static final int savonia=0x7f020001;
     }
     public static final class id {
-        public static final int action_settings=0x7f090011;
+        public static final int action_settings=0x7f090012;
         public static final int aloitaMittausButton=0x7f090004;
         public static final int asetuksetButton=0x7f090006;
         public static final int asetuksetOtsikkoTextView=0x7f090000;
         public static final int asetuksetTallennaButton=0x7f090003;
-        public static final int button_lopetaMittaus=0x7f09000b;
+        public static final int button_lopetaMittaus=0x7f09000c;
+        public static final int imageView1=0x7f090008;
         public static final int kuskinPainoEditText=0x7f090002;
-        public static final int leiska=0x7f09000c;
-        public static final int linearLayout1=0x7f09000d;
-        public static final int list=0x7f090010;
-        public static final int main=0x7f090008;
+        public static final int leiska=0x7f09000d;
+        public static final int linearLayout1=0x7f09000e;
+        public static final int list=0x7f090011;
+        public static final int main=0x7f090009;
         public static final int pyoranPainoEditText=0x7f090001;
         public static final int selaaButton=0x7f090005;
-        public static final int spinner_suure=0x7f09000f;
-        public static final int textView1=0x7f09000e;
-        public static final int textView_laskuri=0x7f09000a;
-        public static final int text_linear=0x7f090009;
+        public static final int spinner_suure=0x7f090010;
+        public static final int textView1=0x7f09000f;
+        public static final int textView_laskuri=0x7f09000b;
+        public static final int text_linear=0x7f09000a;
         public static final int tietojaButton=0x7f090007;
     }
     public static final class layout {
