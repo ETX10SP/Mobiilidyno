@@ -7,7 +7,7 @@ public class Kaavat {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 	
-	// Palauttaa nopeuden yksikössä m/s
+	// Palauttaa nopeuden yksikï¿½ssï¿½ m/s
 	// alkunopeus = m/s
 	// kiihtyvyys_keskiarvo = m/s^2
 	// aika_s = s
@@ -15,7 +15,7 @@ public class Kaavat {
 	{
 		return alkunopeus + kiihtyvyys_keskiarvo * aika_s;
 	}
-	
+
 	// palauttaa tehon watteina (W)
 	// kokonais_massa = kg
 	// kiihtyvyys m/s^2
@@ -24,5 +24,15 @@ public class Kaavat {
 	{
 		return (kokonais_massa * kiihtyvyys * nopeus) / (2 * Math.PI);
 	}
+
+    public static double laskeMatka(double kiihtyvyys, double aika)
+    {
+        return kiihtyvyys * 0.5 * aika * aika;
+    }
+
+    public static double laskeTeho(double massa, double kiihtyvyys, double matka)
+    {
+        return massa * kiihtyvyys * ( matka / 2);
+    }
 
 }

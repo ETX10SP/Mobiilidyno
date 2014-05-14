@@ -1,8 +1,8 @@
 package fi.savonia.etx10sp.mobiilidyno;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
@@ -10,15 +10,12 @@ import android.view.View;
 import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-import com.jjoe64.graphview.GraphViewSeries;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class MittaustenSelausActivity extends Activity implements OnItemSelectedListener {
 	private static final String TAG = "MittaustenSelausActivity";
@@ -86,6 +83,31 @@ public class MittaustenSelausActivity extends Activity implements OnItemSelected
             array.add(item);
         }
 
+        Collections.sort(array, new Comparator<HashMap< String,String >>() {
+
+            @Override
+            public int compare(HashMap<String, String> lhs,
+                               HashMap<String, String> rhs) {
+
+                String s1 = lhs.values().iterator().next();
+                String s2 = rhs.values().iterator().next();
+
+                //25_04_2014_10_45_58
+
+                SimpleDateFormat  format = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+                try {
+                    Date date1 = format.parse(s1);
+                    Date date2 = format.parse(s2);
+                    return date2.compareTo(date1);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return 0;
+            }
+        });
+
         SimpleAdapter sadapter = new SimpleAdapter(this, array, android.R.layout.simple_list_item_1, new String[] { "time" }, new int[] { android.R.id.text1 } );
 
         list.setAdapter(sadapter);
@@ -110,8 +132,8 @@ public class MittaustenSelausActivity extends Activity implements OnItemSelected
                     HashMap<String, String> asetukset = new HashMap<String, String>();
                     asetukset.put("kuski", mittausData.kuskinPaino);
                     asetukset.put("pyora", mittausData.pyoranPaino);
-                    asetukset.put("renkaat", mittausData.renkaat);
-                    asetukset.put("valitykset", mittausData.valitykset);
+                    //asetukset.put("renkaat", mittausData.renkaat);
+                    //asetukset.put("valitykset", mittausData.valitykset);
                     asetukset.put("date", mittausData.date);
 
                     b.putSerializable("mittaus", mittausData);

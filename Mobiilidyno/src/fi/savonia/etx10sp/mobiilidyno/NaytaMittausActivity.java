@@ -32,7 +32,7 @@ public class NaytaMittausActivity extends Activity {
 
         HashMap<String, String> asetukset = (HashMap<String, String>)b.getSerializable("asetukset");
 
-        this.linearAcceleroArray = new MittausDataArray(asetukset.get("kuski"), asetukset.get("pyora"), asetukset.get("renkaat"), asetukset.get("valitykset"), asetukset.get("date"));
+        this.linearAcceleroArray = new MittausDataArray(asetukset.get("kuski"), asetukset.get("pyora"), asetukset.get("date"));
 
         this.linearAcceleroArray.addAll(a);
         
@@ -47,32 +47,46 @@ public class NaytaMittausActivity extends Activity {
         ArrayList<GraphView.GraphViewData> kiihtyvyys = new ArrayList<GraphView.GraphViewData>();
         ArrayList<GraphView.GraphViewData> nopeus = new ArrayList<GraphView.GraphViewData>();
         ArrayList<GraphView.GraphViewData> teho = new ArrayList<GraphView.GraphViewData>();
+        //ArrayList<GraphView.GraphViewData> matka = new ArrayList<GraphView.GraphViewData>();
+        //ArrayList<GraphView.GraphViewData> teho2 = new ArrayList<GraphView.GraphViewData>();
+        //ArrayList<GraphView.GraphViewData> kiihtyvyys2 = new ArrayList<GraphView.GraphViewData>();
 
         Mittaus prev = null;
         double prevNopeus = 0;
         double prevTime = 0;
         double prevKok = 0;
+        //double prevMatka = 0;
 
         for(Mittaus mittaus : this.linearAcceleroArray)
         {
-            double t = mittaus.TimeStamp - this.linearAcceleroArray.get(0).TimeStamp;
+            double t_xAkselille = (mittaus.TimeStamp - this.linearAcceleroArray.get(0).TimeStamp) / 1000;
+
+            double t = (mittaus.TimeStamp - this.linearAcceleroArray.get(0).TimeStamp - prevTime) / 1000;
 
             double a = Kaavat.laskeKokonaiskiihtyvyys(mittaus.X, mittaus.Y, mittaus.Z);
 
-            double v = Kaavat.laskeNopeus(prevNopeus, (a + prevKok) / 2, (t - prevTime) / 1000);
+            double v = Kaavat.laskeNopeus(prevNopeus, (a + prevKok) / 2, t);
 
             double m = Double.parseDouble(this.linearAcceleroArray.kuskinPaino) + Double.parseDouble(this.linearAcceleroArray.pyoranPaino);
 
             double w = Kaavat.laskeTehoWatteina(m, a, v);
 
-            nopeus.add(new GraphView.GraphViewData(t, v));
-            kiihtyvyys.add(new GraphView.GraphViewData(t, a));
-	        teho.add(new GraphView.GraphViewData(t, w));
+            //double s = Kaavat.laskeMatka(a, t-prevTime);
+
+            //double w2 = Kaavat.laskeTeho(m, a, s);
+
+            nopeus.add(new GraphView.GraphViewData(t_xAkselille, v));
+            kiihtyvyys.add(new GraphView.GraphViewData(t_xAkselille, a));
+	        teho.add(new GraphView.GraphViewData(t_xAkselille, w));
+            //matka.add(new GraphView.GraphViewData(t_xAkselille, s+prevMatka));
+            //teho2.add(new GraphView.GraphViewData(t_xAkselille, w2));
+            //kiihtyvyys2.add(new GraphView.GraphViewData(t_xAkselille, a + (a - prevKok)));
 
             prev = mittaus;
             prevNopeus = v;
             prevTime = t;
             prevKok = a;
+            //prevMatka = s;
         }
 
         GraphView graphView;
@@ -80,10 +94,15 @@ public class NaytaMittausActivity extends Activity {
         GraphViewSeries.GraphViewSeriesStyle k = new GraphViewSeries.GraphViewSeriesStyle(Color.rgb(0, 255, 0), 1);
         GraphViewSeries.GraphViewSeriesStyle n = new GraphViewSeries.GraphViewSeriesStyle(Color.rgb(0, 0, 255), 1);
         GraphViewSeries.GraphViewSeriesStyle t = new GraphViewSeries.GraphViewSeriesStyle(Color.rgb(255, 0, 0), 1);
+        //GraphViewSeries.GraphViewSeriesStyle t2 = new GraphViewSeries.GraphViewSeriesStyle(Color.rgb(255, 255, 255), 1);
+        //GraphViewSeries.GraphViewSeriesStyle m = new GraphViewSeries.GraphViewSeriesStyle(Color.rgb(0, 0, 0), 1);
 
         GraphViewSeries kiihtyvyysSeries = new GraphViewSeries("Kiihtyvyys", k, kiihtyvyys.toArray(new GraphView.GraphViewData[kiihtyvyys.size()]));
         GraphViewSeries nopeusSeries = new GraphViewSeries("Nopeus", n, nopeus.toArray(new GraphView.GraphViewData[nopeus.size()]));
         GraphViewSeries tehoSeries = new GraphViewSeries("Teho", t, teho.toArray(new GraphView.GraphViewData[teho.size()]));
+        //GraphViewSeries teho2Series = new GraphViewSeries("Teho2", t2, teho2.toArray(new GraphView.GraphViewData[teho2.size()]));
+        //GraphViewSeries matkaSeries = new GraphViewSeries("Matka", m, matka.toArray(new GraphView.GraphViewData[matka.size()]));
+        //GraphViewSeries kiihtyvyys2Series = new GraphViewSeries("Kiihtyvyys2", k, kiihtyvyys2.toArray(new GraphView.GraphViewData[kiihtyvyys2.size()]));
 
         if(!suure.equals("Kaikki"))
         {
@@ -98,6 +117,14 @@ public class NaytaMittausActivity extends Activity {
                 graphView.addSeries(nopeusSeries);
             else if(suure.equals("Teho"))
                 graphView.addSeries(tehoSeries);
+            /*
+            else if(suure.equals("Teho2"))
+                graphView.addSeries(teho2Series);
+            else if(suure.equals("Matka"))
+                graphView.addSeries(matkaSeries);
+            else if(suure.equals("Kiihtyvyys2"))
+                graphView.addSeries(matkaSeries);
+                */
         }
         else
         {
@@ -108,6 +135,9 @@ public class NaytaMittausActivity extends Activity {
             graphView.addSeries(kiihtyvyysSeries);
             graphView.addSeries(nopeusSeries);
             graphView.addSeries(tehoSeries);
+            //graphView.addSeries(teho2Series);
+            //graphView.addSeries(matkaSeries);
+            //graphView.addSeries(kiihtyvyys2Series);
 
             graphView.setShowLegend(true);
             graphView.setLegendAlign(GraphView.LegendAlign.TOP);

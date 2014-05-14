@@ -16,7 +16,7 @@
     <string name="renkaidenKokoTextView">Renkaiden koko</string>
     <string name="mittaustenSelausOtsikko">Mittaukset</string>
     <string name="tietoaOhjelmastaOtsikko">Tietoa ohjelmasta</string>
-    <string name="title_activity_mittaus">MittausActivity</string>
+    <string name="title_activity_mittaus">Mittaus käynnissä</string>
     <string name="hello_world">Hello world!</string>
     <string name="nopeus">Nopeus</string>
     <string-array name="suureet_array">
